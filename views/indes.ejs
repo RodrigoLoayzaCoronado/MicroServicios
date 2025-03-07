@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda de Contactos</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Agenda de Contactos</h1>
+
+  <!-- Formulario para agregar un nuevo contacto -->
+  <form action="/agenda/crear" method="POST">
+    <label for="nombres">Nombres:</label>
+    <input type="text" id="nombres" name="nombres" required>
+
+    <label for="apellidos">Apellidos:</label>
+    <input type="text" id="apellidos" name="apellidos" required>
+
+    <label for="direccion">Dirección:</label>
+    <input type="text" id="direccion" name="direccion">
+
+    <label for="telefono">Teléfono:</label>
+    <input type="number" id="telefono" name="telefono">
+
+    <button type="submit">Agregar Contacto</button>
+  </form>
+
+  <!-- Lista de contactos -->
+  <h2>Lista de Contactos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombres</th>
+        <th>Apellidos</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% contactos.forEach((contacto) => { %>
+        <tr>
+          <td><%= contacto.id %></td>
+          <td><%= contacto.nombres %></td>
+          <td><%= contacto.apellidos %></td>
+          <td><%= contacto.direccion %></td>
+          <td><%= contacto.telefono %></td>
+          <td>
+            <a href="/agenda/editar/<%= contacto.id %>">Editar</a>
+            <a href="/agenda/eliminar/<%= contacto.id %>">Eliminar</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

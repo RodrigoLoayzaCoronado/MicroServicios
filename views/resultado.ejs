@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultado</title>
+  <link rel="stylesheet" href="../public/styles.css">
+</head>
+<body>
+  <h1>Tabla de Operaciones</h1>
+  <p>Operación: <%= operacion %></p>
+  <p>Número: <%= numero %></p>
+  <p>Rango: <%= inicio %> a <%= fin %></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Operación</th>
+        <th>Resultado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% resultados.forEach((item) => { %>
+        <tr>
+          <td>
+            <%= numero %> <%= operacion === 'sumar' ? '+' : operacion === 'restar' ? '-' : operacion === 'multiplicar' ? '*' : '/' %> <%= item.i %> =
+          </td>
+          <td><%= item.resultado %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <a href="/">Volver al formulario</a>
+</body>
+</html>
