@@ -1,21 +1,23 @@
-version: '1.0'
+version: '3.8'
+
 services:
   api:
     build: .
     ports:
       - "3000:3000"
     environment:
-      - MONGODB_URI=mongodb://root:parcial@mongo:27017/librosdb
+      - MONGODB_URI=mongodb://mongo:27017/librosdb
     depends_on:
       - mongo
+    restart: unless-stopped
+
   mongo:
     image: mongo:6.0
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: parcial
     volumes:
       - mongo-data:/data/db
+    command: [--bind_ip_all]  # Permite conexiones desde cualquier IP
+
 volumes:
   mongo-data:
