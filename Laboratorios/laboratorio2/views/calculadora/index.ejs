@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="calculator-container">
+        <h1><%= title %></h1>
+        <a href="/" class="btn-back">← Volver al Inicio</a>
+        
+        <form action="/calculadora/calculate" method="POST">
+            <input type="number" name="a" value="<%= a %>" step="any" required placeholder="Primer número">
+            
+            <select name="operation" required>
+                <option value="sum" <%= operation === 'sum' ? 'selected' : '' %>>Suma (+)</option>
+                <option value="subtract" <%= operation === 'subtract' ? 'selected' : '' %>>Resta (-)</option>
+                <option value="multiply" <%= operation === 'multiply' ? 'selected' : '' %>>Multiplicación (×)</option>
+                <option value="divide" <%= operation === 'divide' ? 'selected' : '' %>>División (÷)</option>
+            </select>
+            
+            <input type="number" name="b" value="<%= b %>" step="any" required placeholder="Segundo número">
+            
+            <button type="submit">Calcular</button>
+        </form>
+
+        <% if (result !== null || error) { %>
+            <div class="result-box <%= error ? 'error' : 'success' %>">
+                <% if (error) { %>
+                    <p>❌ <%= error %></p>
+                <% } else { %>
+                    <p>✅ Resultado: <strong><%= result %></strong></p>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>

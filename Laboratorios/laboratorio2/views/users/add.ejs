@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1><%= title %></h1>
+        <a href="/users" class="btn-back">← Volver a Usuarios</a>
+        
+        <% if (error) { %>
+            <div class="alert error">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <form action="/users/add" method="POST">
+            <div class="form-group">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" name="name" value="<%= formData ? formData.name : '' %>" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="<%= formData ? formData.email : '' %>" required>
+            </div>
+            
+            <button type="submit">Guardar</button>
+        </form>
+    </div>
+</body>
+</html>
