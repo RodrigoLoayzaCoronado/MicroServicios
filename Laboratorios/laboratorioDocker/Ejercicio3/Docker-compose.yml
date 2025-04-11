@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: practica3-api
+    ports:
+      - "4000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/tareasdb
+    volumes:
+      - .:/app
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    container_name: practica3-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
