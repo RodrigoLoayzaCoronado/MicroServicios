@@ -85,6 +85,24 @@ services:
     depends_on:
       - mongo
       - loki
+  reservations-service:
+    build: ./reservations-service
+    ports:
+      - "3003:3003"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=reservationsdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=yourpassword
+      - RABBITMQ_HOST=rabbitmq
+      - JWT_SECRET=your_secret
+      - AUTH_SERVICE_URL=http://auth-service:3000
+    networks:
+      - medical-net
+    depends_on:
+      - postgres
+      - rabbitmq
+      - loki
 volumes:
   mysql-data:
   postgres-data:
