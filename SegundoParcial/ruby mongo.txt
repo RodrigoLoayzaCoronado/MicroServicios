@@ -1,0 +1,83 @@
+# app.rb
+require 'sinatra'
+require 'json'
+require 'mongo'
+
+# Configura Sinatra para devolver JSON
+before do
+  content_type :json
+end
+
+# Configura la conexión a MongoDB
+Mongo::Logger.logger.level = Logger::FATAL # Reduce los logs de MongoDB
+client = Mongo::Client.new('mongodb://mongo:27017/sinatra_db') # Conecta a la base de datos 'sinatra_db'
+db = client.database
+$users_collection = db[:users] # Colección 'users'
+
+# GET: Obtener todos los usuarios
+get '/api/users' do
+  users = $users_collection.find.to_a
+  users.map { |user| user.except('_id') }.to_json # Excluye '_id' para evitar problemas con JSON
+end
+
+# GET: Obtener un usuario por ID
+get '/api/users/:id' do
+  user = $users_collection.find(_id: BSON::ObjectId(params[:id])).first
+  halt 404, { message: 'Usuario no encontrado' }.to_json unless user
+  user.except('_id').to_json
+end
+
+# POST: Crear un nuevo usuario
+post '/api/users' do
+  request.body.rewind
+  data = JSON.parse(request.body.read)
+  new_user = { name: data['name'], email: data['email'] }
+  result = $users_collection.insert_one(new_user)
+  { id: result.inserted_id.to_s, name: data['name'], email: data['email'] }.to_json
+end
+
+# PUT: Actualizar un usuario existente
+put '/api/users/:id' do
+  request.body.rewind
+  data = JSON.parse(request.body.read)
+  result = $users_collection.update_one(
+    { _id: BSON::ObjectId(params[:id]) },
+    { '$set' => { name: data['name'], email: data['email'] } }
+  )
+  halt 404, { message: 'Usuario no encontrado' }.to_json if result.matched_count == 0
+  { id: params[:id], name: data['name'], email: data['email'] }.to_json
+end
+
+# DELETE: Eliminar un usuario
+delete '/api/users/:id' do
+  result = $users_collection.delete_one(_id: BSON::ObjectId(params[:id]))
+  halt 404, { message: 'Usuario no encontrado' }.to_json if result.deleted_count == 0
+  status 204
+  { message: "Usuario con ID #{params[:id]} eliminado" }.to_json
+end
+
+# Ruta raíz para probar que el servidor funciona
+get '/' do
+  content_type :text
+  '¡API REST con Sinatra y MongoDB funcionando!'
+end
+
+yaml
+services:
+  ruby:
+    build: ./rubySinatra
+    volumes:
+      - ./rubySinatra:/app  # Monta el código directamente
+    ports:
+      - "4567:4567"
+Comandos más eficientes:
+
+docker-compose restart ruby - Solo reinicia el servicio modificado
+
+docker-compose up -d --no-build - Levanta servicios sin reconstruir
+
+Cuando necesites reconstruir:
+
+docker-compose build ruby - Reconstruye solo un servicio
+
+docker-compose up -d --build ruby - Reconstruye y levanta solo un servicio

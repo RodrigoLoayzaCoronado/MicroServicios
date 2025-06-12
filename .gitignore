@@ -1,0 +1,30 @@
+# Directorios de módulos
+node_modules/
+*/node_modules/
+
+# Archivos de datos de bases de datos
+data/
+db/
+WiredTiger*
+journal/
+*.sock
+*.lock
+*/mysql_data/
+*/postgres-data/
+*/mongo-data/
+
+# Otros archivos/directorios temporales
+npm-debug.log*
+*.log
+.env
+.env.*.local
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Si NO quieres versionar estas carpetas completas (excepto si son submódulos)
+# Comenta estas líneas si SÍ quieres versionarlas como parte de este repo principal
+Laboratorios/
+Practicas/
+SegundoParcial/
+Exposicion/microservice_of_event_ticketing_system/ # Ignorará todo el contenido si no es submódulo

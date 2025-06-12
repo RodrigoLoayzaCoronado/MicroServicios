@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  nodejs:
+    build: ./nodejs
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./nodejs/.env
+    environment:
+      - DB_HOST=mysql
+      - DB_PASSWORD=password
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - red
+
+  ruby:
+    build: ./rubySinatra
+    ports:
+      - "4567:4567"
+    env_file:
+      - ./rubySinatra/.env
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/habitaciones_db
+      - JWT_SECRET=clave_secreta123
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - red
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=hotel_db
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - red
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=habitaciones_db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - red
+
+networks:
+  red:
+    driver: bridge
