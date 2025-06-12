@@ -17,7 +17,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-    command: [--bind_ip_all] 
+    command: [--bind_ip_all]  # Permite conexiones desde cualquier IP
 
 volumes:
   mongo-data:
