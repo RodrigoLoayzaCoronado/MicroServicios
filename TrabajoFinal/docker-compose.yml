@@ -1,0 +1,94 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=authdb
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-scripts/init-users.sql:/docker-entrypoint-initdb.d/init-users.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - medical-net
+    healthcheck: # <-- ¡Añade o verifica esta sección!
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s # Dale tiempo a MySQL para arrancar completamente
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_PASSWORD=yourpassword
+      - POSTGRES_DB=reservationsdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts/init-reservations.sql:/docker-entrypoint-initdb.d/init-reservations.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - medical-net
+  mongo:
+    image: mongo
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - medical-net
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - medical-net
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    networks:
+      - medical-net
+  grafana:
+    image: grafana/grafana:9.5.0
+    ports:
+      - "3000:3000"
+    networks:
+      - medical-net
+    depends_on:
+      - loki
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3000"
+    environment:
+      - MYSQL_HOST=mysql
+      - JWT_SECRET=your_secret
+    networks:
+      - medical-net
+    depends_on:
+      - mysql
+      - loki
+  specialties-service:
+    build: ./specialties-service
+    ports:
+      - "3002:3001"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/specialtiesdb
+      - JWT_SECRET=your_secret
+    networks:
+      - medical-net
+    depends_on:
+      - mongo
+      - loki
+volumes:
+  mysql-data:
+  postgres-data:
+  mongo-data:
+networks:
+  medical-net:
+    driver: bridge
