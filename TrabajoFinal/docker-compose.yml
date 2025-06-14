@@ -64,7 +64,7 @@ services:
   auth-service:
     build: ./auth-service
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
       - MYSQL_HOST=mysql
       - JWT_SECRET=your_secret
@@ -76,7 +76,7 @@ services:
   specialties-service:
     build: ./specialties-service
     ports:
-      - "3002:3001"
+      - "3002:3002"
     environment:
       - MONGO_URI=mongodb://mongo:27017/specialtiesdb
       - JWT_SECRET=your_secret
@@ -96,7 +96,7 @@ services:
       - POSTGRES_PASSWORD=yourpassword
       - RABBITMQ_HOST=rabbitmq
       - JWT_SECRET=your_secret
-      - AUTH_SERVICE_URL=http://auth-service:3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
     networks:
       - medical-net
     depends_on:
@@ -116,15 +116,26 @@ services:
       - rabbitmq
       - loki
   nginx:
-    build: ./nginx
+    build: ./nginx # El Dockerfile de Nginx seguirá en ./nginx
     ports:
-      - "80:80"
+      - "80:80" # Nginx escuchará en el puerto 80 del host
     depends_on:
+      - frontend # <-- Nginx ahora depende del frontend
       - auth-service
       - specialties-service
       - reservations-service
     networks:
       - medical-net
+  frontend:
+    build:
+      context: ./frontend # El contexto de construcción es tu carpeta 'frontend'
+      dockerfile: Dockerfile # Busca el Dockerfile directamente en 'frontend/'
+    container_name: frontend # Nombre del contenedor
+    ports:
+      - "3005:3005" # Mapea el puerto 3000 del host al 3000 del contenedor (donde http-server escucha)
+    networks:
+      - medical-net
+
 volumes:
   mysql-data:
   postgres-data:
