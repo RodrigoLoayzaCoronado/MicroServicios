@@ -6,3 +6,4 @@ pika
 python-dotenv
 PyJWT
 requests
+python-json-logger

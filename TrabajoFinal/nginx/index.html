@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Medical Appointment System</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+      <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+      <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+      <script src="https://unpkg.com/graphql@16.6.0/dist/graphql.min.js"></script>
+  </head>
+  <body>
+      <div id="app"></div>
+      <script type="text/babel">
+          const { useState, useEffect } = React;
+
+          const App = () => {
+              const [token, setToken] = useState(localStorage.getItem('token') || '');
+              const [message, setMessage] = useState('');
+
+              const login = async () => {
+                  const credentials = { username: 'user', password: 'pass' }; // Replace with real credentials
+                  const response = await fetch('/auth/login', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(credentials),
+                  });
+                  const data = await response.json();
+                  if (data.token) {
+                      setToken(data.token);
+                      localStorage.setItem('token', data.token);
+                      setMessage('Logged in!');
+                  }
+              };
+
+              const fetchSpecialties = async () => {
+                  const response = await fetch('/specialties/', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                      body: JSON.stringify({ query: '{ getSpecialties { id name } }' }),
+                  });
+                  const data = await response.json();
+                  setMessage(JSON.stringify(data));
+              };
+
+              return (
+                  <div className="p-4">
+                      <h1 className="text-2xl font-bold">Medical Appointment System</h1>
+                      {!token ? (
+                          <button onClick={login} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Login</button>
+                      ) : (
+                          <div>
+                              <button onClick={fetchSpecialties} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">Get Specialties</button>
+                              <p className="mt-4">{message}</p>
+                          </div>
+                      )}
+                  </div>
+              );
+          };
+
+          ReactDOM.render(<App />, document.getElementById('app'));
+      </script>
+  </body>
+  </html>

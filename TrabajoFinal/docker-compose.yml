@@ -103,6 +103,28 @@ services:
       - postgres
       - rabbitmq
       - loki
+  notifications-service:
+    build: ./notifications-service
+    ports:
+      - "3004:3004"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - NOTIFICATION_API_URL=http://example.com/send
+    networks:
+      - medical-net
+    depends_on:
+      - rabbitmq
+      - loki
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - specialties-service
+      - reservations-service
+    networks:
+      - medical-net
 volumes:
   mysql-data:
   postgres-data:
